@@ -62,7 +62,6 @@ while _continue:
     elif choice == "stand":
         total_bot = 0
         bot[1] = random.choice(cards)
-        print(bot)
         for i in bot:
             if i in cards_ten:
                 i = 10
@@ -79,7 +78,7 @@ while _continue:
                 elif i in cards_A:
                     i = random.choice(cards_A1)
                 total_bot += i
-
+        print(bot)
         if total_bot > 21:
             print(total_bot)
             print("You win")
