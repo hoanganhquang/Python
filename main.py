@@ -1,28 +1,41 @@
 import random
-
-print("I'm thinking of a number between 1 and 100.")
-level = input("Choose a difficulty. Type 'easy' or 'hard: ")
-result = random.randint(1, 100)
+from datas import data
 
 
-def guess(attempt):
-    while attempt > 0:
-        print(f"You have {attempt} remaining to guess the number")
-        me_guess = int(input("Make a guess: "))
-        if me_guess > result:
-            print("Too high\n"
-                  "Guess again")
-            attempt -= 1
-        elif me_guess < result:
-            print("Too low\n"
-                  "Guess again")
-            attempt -= 1
+def _print(person, a):
+    print(f"{a}: {person['name']}, a {person['description']}, from {person['country']}")
+
+
+compareA = random.choice(data)
+_print(compareA, "Compare A")
+
+against = random.choice(data)
+_print(against, "Against B")
+
+score = 0
+_continue = True
+while _continue:
+    guess = input("Who has more follower? A or B: ")
+    if guess == "A":
+        if compareA["follower_count"] > against["follower_count"]:
+            score += 1
+            print(f"You're right! Current score: {score}")
+            _print(compareA, "Compare A")
+            against = random.choice(data)
+            _print(against, "Against B")
+            _continue = True
         else:
-            print("You win")
-            break
-
-
-if level == "easy":
-    guess(10)
-else:
-    guess(5)
+            print(f"Sorry, that's wrong. Final score: {score}")
+            _continue = False
+    else:
+        if compareA["follower_count"] < against["follower_count"]:
+            score += 1
+            print(f"You're right! Current score: {score}")
+            compareA = against
+            _print(compareA, "Compare A")
+            against = random.choice(data)
+            _print(against, "Against B")
+            _continue = True
+        else:
+            print(f"Sorry, that's wrong. Final score: {score}")
+            _continue = False
