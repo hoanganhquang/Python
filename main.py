@@ -55,4 +55,3 @@ while _continue:
         elif total < price:
             print("You don't have enough money")
     _continue = True
-
