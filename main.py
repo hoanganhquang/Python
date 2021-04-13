@@ -1,41 +1,55 @@
-import random
-from datas import data
+from datas import MENU, resources
 
 
-def _print(person, a):
-    print(f"{a}: {person['name']}, a {person['description']}, from {person['country']}")
+# Coins
+penny = 0.01
+dime = 0.1
+nickel = 0.05
+quarter = 0.25
+
+payment_request = "You need to pay before receiving it"
+price = 0
+total = 0
 
 
-compareA = random.choice(data)
-_print(compareA, "Compare A")
+def resource():
+    for i in resources:
+        print(resources[i])
 
-against = random.choice(data)
-_print(against, "Against B")
 
-score = 0
+def cost(_type):
+    global price
+    price = MENU[_type]['cost']
+    print(f"The price of this is: {MENU[_type]['cost']}")
+    return price
+
+
+def payment():
+    global total
+    _penny = int(input("Penny: "))
+    _dime = int(input("Dime: "))
+    _nickel = int(input("Nickel: "))
+    _quarter = int(input("Quarter: "))
+    total = (_penny * penny) + (_dime * dime) + (_nickel * nickel) + (_quarter * quarter)
+    return total
+
+
+def statistics(_type):
+    ingredient = MENU[_type]["ingredients"]
+    for i in ingredient:
+        resources[i] = resources[i] - ingredient[i]
+
+
 _continue = True
 while _continue:
-    guess = input("Who has more follower? A or B: ")
-    if guess == "A":
-        if compareA["follower_count"] > against["follower_count"]:
-            score += 1
-            print(f"You're right! Current score: {score}")
-            _print(compareA, "Compare A")
-            against = random.choice(data)
-            _print(against, "Against B")
+    type_coffee = input("What would you like? ").lower()
+    if type_coffee == "report":
+        resource()
+    elif type_coffee == "espresso":
+        cost(type_coffee)
+        print(payment_request)
+        payment()
+        if total == price:
+            print("Thank you. Bon appetite!")
+            statistics(type_coffee)
             _continue = True
-        else:
-            print(f"Sorry, that's wrong. Final score: {score}")
-            _continue = False
-    else:
-        if compareA["follower_count"] < against["follower_count"]:
-            score += 1
-            print(f"You're right! Current score: {score}")
-            compareA = against
-            _print(compareA, "Compare A")
-            against = random.choice(data)
-            _print(against, "Against B")
-            _continue = True
-        else:
-            print(f"Sorry, that's wrong. Final score: {score}")
-            _continue = False
