@@ -52,4 +52,7 @@ while _continue:
         if total == price:
             print("Thank you. Bon appetite!")
             statistics(type_coffee)
-            _continue = True
+        elif total < price:
+            print("You don't have enough money")
+    _continue = True
+
