@@ -8,6 +8,7 @@ nickel = 0.05
 quarter = 0.25
 
 payment_request = "You need to pay before receiving it"
+not_enough_ingredients = "Not enough ingredients"
 price = 0
 total = 0
 
@@ -35,9 +36,28 @@ def payment():
 
 
 def statistics(_type):
+    a = 0
     ingredient = MENU[_type]["ingredients"]
     for i in ingredient:
-        resources[i] = resources[i] - ingredient[i]
+        if resources[i] < ingredient[i]:
+            a += 1
+    if a > 0:
+        return not_enough_ingredients
+    else:
+        for i in ingredient:
+            resources[i] = resources[i] - ingredient[i]
+
+
+def deal(_type):
+    cost(_type)
+    print(payment_request)
+    payment()
+    if total == price:
+        print("Thank you. Bon appetite!")
+    elif total < price:
+        print("You don't have enough money")
+    else:
+        print(f"Here's your change: {total - price}")
 
 
 _continue = True
@@ -45,13 +65,10 @@ while _continue:
     type_coffee = input("What would you like? ").lower()
     if type_coffee == "report":
         resource()
-    elif type_coffee == "espresso":
-        cost(type_coffee)
-        print(payment_request)
-        payment()
-        if total == price:
-            print("Thank you. Bon appetite!")
-            statistics(type_coffee)
-        elif total < price:
-            print("You don't have enough money")
+    else:
+        if statistics(type_coffee) == not_enough_ingredients:
+            print(not_enough_ingredients)
+        else:
+            deal(type_coffee)
+
     _continue = True
