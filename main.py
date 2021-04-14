@@ -72,3 +72,4 @@ while _continue:
             deal(type_coffee)
 
     _continue = True
+
