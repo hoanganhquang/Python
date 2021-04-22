@@ -1,35 +1,26 @@
-import turtle
-from turtle import  Turtle, Screen
-import random
+from turtle import Screen
+import time
+from snake import Snake
 
 screen = Screen()
-screen.setup(width=500, height=400)
-user_bet = screen.textinput(title="Make you bet", prompt="Choose color: ")
-colors = ["red", "orange", "yellow", "green", "blue", "purple"]
-y_positions = [-70, -40, -10, 20, 50, 80]
-all_turtle = []
+screen.setup(width=600, height=600)
+screen.bgcolor("black")
+screen.title("My snake game")
+screen.tracer(0)
 
-for turtle_index in range(0, 6):
-    new_turtle = Turtle(shape="turtle")
-    new_turtle.color(colors[turtle_index])
-    new_turtle.penup()
-    new_turtle.goto(x=-230, y=y_positions[turtle_index])
-    all_turtle.append(new_turtle)
+tim = Snake()
 
-if user_bet:
-    race = True
+screen.listen()
+screen.onkey(tim.up, "Up")
+screen.onkey(tim.down, "Down")
+screen.onkey(tim.right, "Right")
+screen.onkey(tim.left, "Left")
 
-while race:
-    for turtle in all_turtle:
-        if turtle.xcor() > 230:
-            race=False
-            win = turtle.pencolor()
-            if win == user_bet:
-                print("You win")
-            else:
-                print("you lost")
-        ran_distance = random.randint(0, 10)
-        turtle.forward(ran_distance)
+on_game = True
+while on_game:
+    screen.update()
+    time.sleep(0.1)
+    tim.move()
 
 
 
