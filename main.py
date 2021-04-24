@@ -1,40 +1,40 @@
 from turtle import Screen
+from paddle import Paddle
+from ball import Ball
 import time
-from snake import Snake
-from food import Food
-from scoreboard import Score
 
 screen = Screen()
-screen.setup(width=600, height=600)
+screen.setup(width=800, height=600)
 screen.bgcolor("black")
-screen.title("My snake game")
+screen.title("Pong")
 screen.tracer(0)
 
-tim = Snake()
-food = Food()
-score = Score()
+r_paddle = Paddle((350, 0))
+l_paddle = Paddle((-350, 0))
+ball = Ball()
+
 
 screen.listen()
-screen.onkey(tim.up, "Up")
-screen.onkey(tim.down, "Down")
-screen.onkey(tim.right, "Right")
-screen.onkey(tim.left, "Left")
+screen.onkey(key="Up", fun=r_paddle.up)
+screen.onkey(key="Down", fun=r_paddle.down)
+screen.onkey(key="W", fun=l_paddle.up)
+screen.onkey(key="S", fun=l_paddle.down)
 
 on_game = True
 while on_game:
     screen.update()
     time.sleep(0.1)
-    tim.move()
-    if tim.head.distance(food) < 15:
-        food.refresh()
-        score.total_score()
-        tim.extend()
-    if tim.head.xcor() > 280 or tim.head.xcor() < -280 or tim.head.ycor() > 280 or tim.head.ycor() < -280:
-        score.game_over()
-        on_game = False
-    for s in tim.segments[1:]:
-        if tim.head.distance(s) < 10:
-            on_game = False
-            score.game_over()
+    ball.move()
+    if ball.ycor() == 270:
+        ball.wall()
+
+
+
+
+
+
+
+
+
 screen.exitonclick()
 
