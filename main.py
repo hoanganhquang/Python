@@ -1,10 +1,23 @@
-import pandas
+import tkinter
 
-data = pandas.read_csv("nato.csv")
+window = tkinter.Tk()
+window.title("My first GUI program")
+window.minsize(width=400, height=400)
 
-new_dict = {row.letter: row.code for (index, row) in data.iterrows()}
+my_label = tkinter.Label(text="New Text")
+my_label.pack()
 
-name_input = input("Enter a word: ").upper()
+def change_text():
+    a = input_.get()
+    my_label.config(text=a)
 
-new_name = [new_dict[word] for word in name_input]
-print(new_name)
+
+button = tkinter.Button(text="click", command=change_text)
+button.pack()
+
+input_ = tkinter.Entry()
+input_.pack()
+
+
+
+window.mainloop()
