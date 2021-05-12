@@ -1,98 +1,82 @@
 from tkinter import *
-import math
+from tkinter import messagebox
+import random
+import pyperclip
 
-PINK = "#e2979c"
-RED = "#e7385b"
-GREEN = "#9bdeac"
-YELLOW = "#f7f5dd"
-FONT_NAME = "Courier"
-WORK_MIN = 25
-BREAK_MIN = 5
-reps = 0
-timer = None
+letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'
+               , 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'
+               , 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
-
-def reset_timer():
-    global reps
-    window.after_cancel(timer)
-    timer_label.config(text="Timer", fg="white")
-    canvas.itemconfig(timer_text, text=f"00:00")
-    check_mark.config(text="")
-    reps = 0
+numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
 
-def start_timer():
-    global reps
-    reps += 1
-    work = WORK_MIN * 60
-    short_break = BREAK_MIN * 60
+def ran_pass():
+    nr_letters = random.randint(8, 10)
+    nr_symbols = random.randint(2, 4)
+    nr_numbers = random.randint(2, 4)
 
-    if reps % 2 == 0:
-        countdown(short_break)
-        timer_label.config(text="Break", fg="white")
-        window.deiconify()
+    password_list1 = [random.choice(letters) for letter in range(nr_letters)]
+    password_list2 = [random.choice(numbers) for letter in range(nr_numbers)]
+    password_list3 = [random.choice(symbols) for letter in range(nr_symbols)]
+
+    password_list = password_list1 + password_list2 + password_list3
+    random.shuffle(password_list)
+
+    password = "".join(password_list)
+
+    input_pass.insert(0, password)
+    pyperclip.copy(password)
+
+
+def save_info():
+    if len(input_website.get()) < 1 or len(input_email.get()) < 1 or len(input_pass.get()) < 1:
+        messagebox.showwarning(title="Oops", message="Data invalid")
     else:
-        countdown(work)
-        timer_label.config(text="Work", fg="white")
+        ok = messagebox.askokcancel(title=input_website.get(), message=f"Email: {input_email.get()}\n "
+                                                                       f"Password: {input_pass.get()}\n "
+                                                                       f"Are you sure?")
+        if ok:
+            with open("info.txt", "a") as file:
+                file.write(f"{input_website.get()} | {input_email.get()} | {input_pass.get()}\n")
 
-
-def countdown(count):
-
-    _min = math.floor(count / 60)
-    _sec = count % 60
-    if _min < 10:
-        _min = f"0{_min}"
-    if _sec < 10:
-        _sec = f"0{_sec}"
-
-    canvas.itemconfig(timer_text, text=f"{_min}:{_sec}")
-    if count > 0:
-        global timer
-        timer = window.after(1000, countdown, count - 1)
-    else:
-        start_timer()
-        mark = ""
-        work_sessions = math.floor(reps/2)
-        for i in range(work_sessions):
-            mark += "✔"
-        check_mark.config(text=mark)
-
-        if len(mark) == int(input_.get()):
-            window.after_cancel(timer)
-            reset_timer()
-            check_mark.config(text=mark)
+            input_website.delete(0, END)
+            input_email.delete(0, END)
+            input_pass.delete(0, END)
 
 
 window = Tk()
-window.title("Pomodoro")
-window.config(bg=GREEN, padx=30)
-window.maxsize(730, 500)
+window.title("Password Manager")
+window.config(padx=20, pady=20)
 
-timer_label = Label(text="Timer", font=(FONT_NAME, 40, "bold"), fg="white", bg=GREEN)
-timer_label.grid(row=0, column=1)
+canvas = Canvas(width=200, height=200)
+pass_image = PhotoImage(file="pass.png")
+canvas.create_image(100, 100, image=pass_image)
+canvas.grid(row=0, column=1)
 
-canvas = Canvas(width=662, height=377, bg=GREEN, highlightthickness=0)
-tomato_img = PhotoImage(file="png-clipart-computer-icons-scalable-graphics-tomato-emoji-food-tomato-removebg-preview.png")
-canvas.create_image(331, 188.5, image=tomato_img)
-timer_text = canvas.create_text(331, 215, text="00:00", fill="white", font=(FONT_NAME, 40, "bold"))
-canvas.grid(row=1, column=1)
+website_label = Label(text="Website", font=("Times", 10))
+website_label.grid(row=1, column=0)
 
-type_label = Label(text="Enter quantity", font=(FONT_NAME, 11, "bold"), fg="white", bg=GREEN)
-type_label.place(x=5, y=5)
+email_label = Label(text="Email/Username:", font=("Times", 10))
+email_label.grid(row=2, column=0)
 
-input_ = Entry(width=5)
-input_.place(x=137, y=6)
+pass_label = Label(text="Password", font=("Times", 10))
+pass_label.grid(row=3, column=0)
 
-start_btn = Button(text="Start", highlightthickness=0, command=start_timer, font=(FONT_NAME, 12, "bold"))
-start_btn.config(padx=20, pady=10)
-start_btn.place(x=50, y=400)
+input_website = Entry(width=51)
+input_website.grid(row=1, column=1, columnspan=2)
+input_website.focus()
 
-reset_btn = Button(text="Reset", highlightthickness=0, command=reset_timer, font=(FONT_NAME, 12, "bold"))
-reset_btn.config(padx=20, pady=10)
-reset_btn.place(x=510, y=400)
+input_email = Entry(width=51)
+input_email.grid(row=2, column=1, columnspan=2)
 
-check_mark = Label(font=(FONT_NAME, 30), fg="white", bg=GREEN)
-check_mark.grid(row=2, column=1)
+input_pass = Entry(width=33)
+input_pass.grid(row=3, column=1)
+
+generate = Button(text="Generate Password", command=ran_pass)
+generate.grid(row=3, column=2)
+
+add_btn = Button(text="Add", width=42, command=save_info)
+add_btn.grid(row=4, column=1, columnspan=2)
 
 window.mainloop()
-
