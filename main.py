@@ -2,10 +2,11 @@ from tkinter import *
 from tkinter import messagebox
 import random
 import pyperclip
+import json
 
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v'
-               , 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'
-               , 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    , 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'
+    , 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
@@ -30,19 +31,34 @@ def ran_pass():
 
 
 def save_info():
+    new_data = {input_website.get(): {"Email": f"{input_email.get()}",
+                                        "Password": f"{input_pass.get()}"}}
     if len(input_website.get()) < 1 or len(input_email.get()) < 1 or len(input_pass.get()) < 1:
         messagebox.showwarning(title="Oops", message="Data invalid")
     else:
-        ok = messagebox.askokcancel(title=input_website.get(), message=f"Email: {input_email.get()}\n "
-                                                                       f"Password: {input_pass.get()}\n "
-                                                                       f"Are you sure?")
-        if ok:
-            with open("info.txt", "a") as file:
-                file.write(f"{input_website.get()} | {input_email.get()} | {input_pass.get()}\n")
+        try:
+            with open("info.json", "r") as file:
+                data = json.load(file)
+                data.update(new_data)
+        except:
+            with open("info.json", "w") as file:
+                json.dump(new_data, file, indent=4)
+                input_website.delete(0, END)
+                input_pass.delete(0, END)
+        else:
+            with open("info.json", "w") as file:
+                json.dump(data, file, indent=4)
+                input_website.delete(0, END)
+                input_pass.delete(0, END)
 
-            input_website.delete(0, END)
-            input_email.delete(0, END)
-            input_pass.delete(0, END)
+
+def find_password():
+    with open("info.json", "r") as file:
+        data = json.load(file)
+
+    if input_website.get() in data:
+        messagebox.showinfo(title=input_website.get(), message=f"Email: {data[input_website.get()]['Email']}\n"
+                                                                f"Pass: {data[input_website.get()]['Password']}")
 
 
 window = Tk()
@@ -63,8 +79,8 @@ email_label.grid(row=2, column=0)
 pass_label = Label(text="Password", font=("Times", 10))
 pass_label.grid(row=3, column=0)
 
-input_website = Entry(width=51)
-input_website.grid(row=1, column=1, columnspan=2)
+input_website = Entry(width=33)
+input_website.grid(row=1, column=1)
 input_website.focus()
 
 input_email = Entry(width=51)
@@ -78,5 +94,9 @@ generate.grid(row=3, column=2)
 
 add_btn = Button(text="Add", width=42, command=save_info)
 add_btn.grid(row=4, column=1, columnspan=2)
+
+search_btn = Button(text="Search", width=13, command=find_password)
+search_btn.grid(row=1, column=2)
+
 
 window.mainloop()
