@@ -1,25 +1,23 @@
-import smtplib
-import datetime as dt
-import pandas
+import requests
+from tkinter import *
 
-my_email = "tabpython0105@gmail.com"
-password = "Quangpython123456"
 
-now = dt.datetime.now()
-year = now.year
-month = now.month
-date = now.day
-data = pandas.read_csv("birthdays.csv")
-data1 = data.to_dict(orient="records")
-
-for row in data1:
-    if row["year"] == year and row["month"] == month and row['day'] == date:
-        with open("let1.txt", "r") as text:
-            text1 = text.read()
-            text1 = text1.replace("[NAME]", row["name"])
-
-        with smtplib.SMTP("smtp.gmail.com") as mail:
-            mail.starttls()
-            mail.login(my_email, password)
-            mail.sendmail(from_addr=my_email, to_addrs=my_email,
-                          msg=f"Subject: HPBD!\n\n {text1}")
+# def get_quote():
+#     api = requests.get(url="https://api.kanye.rest/")
+#     quote = api.json()["quote"]
+#     text.config(text=quote)
+#
+#
+# window = Tk()
+# window.geometry("500x500")
+# window.maxsize(500, 500)
+#
+# text = Label(text="haha")
+# text.grid(row=0, column=0)
+#
+# btn = Button(text="Click", command=get_quote)
+# btn.grid(row=1, column=0)
+#
+#
+#
+# window.mainloop()
