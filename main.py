@@ -1,8 +1,8 @@
 import requests
 from datetime import datetime
 
-app_ID = "bee59748"
-app_Key = "41599ba87596214f148f272c757fd338"
+app_ID = ""
+app_Key = ""
 
 input_ = input("Tell me which exercises you did: ")
 
@@ -19,18 +19,18 @@ headers = {
     "x-app-key": app_Key,
 }
 
-url = "https://trackapi.nutritionix.com/v2/natural/exercise"
+url = ""
 
 response = requests.post(url=url, json=parameters, headers=headers)
 data = response.json()
 
-url_sheet = "https://api.sheety.co/c116e53c4127320e7dac36feff50582f/workoutTracking/workouts"
+url_sheet = ""
 date = datetime.now()
 day = date.strftime("%d/%m/%Y")
 time = date.strftime("%X")
 
 headers_sheet = {
-    "Authorization": "Basic dGFiOlF1YW5nMTIzNDU2"
+    ""
 }
 
 for exercise in data["exercises"]:
