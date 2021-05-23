@@ -1,43 +1,50 @@
 import requests
 from datetime import datetime
 
-user_name = "tab"
-token = "jennieee"
-pixela_endpoint = "https://pixe.la/v1/users"
-user_params = {
-    "token": token,
-    "username": user_name,
-    "agreeTermsOfService": "yes",
-    "notMinor": "yes"
-}
-# response = requests.post(url=pixela_endpoint, json=user_params)
-# print(response.text)
+app_ID = "bee59748"
+app_Key = "41599ba87596214f148f272c757fd338"
 
-graph_endpoint = f"https://pixe.la/v1/users/{user_name}/graphs"
-graph_config = {
-    "id": "graph1",
-    "name": "ReadingBook",
-    "unit": "commit",
-    "type": "int",
-    "color": "kuro"
+input_ = input("Tell me which exercises you did: ")
+
+parameters = {
+    "query": input_,
+    "gender": "male",
+    "weight_kg": 65,
+    "height_cm": 170,
+    "age": 21
 }
 
 headers = {
-    "X-USER-TOKEN": token
+    "x-app-id": app_ID,
+    "x-app-key": app_Key,
 }
 
-# response = requests.post(url=graph_endpoint, json=graph_config, headers=headers)
-# print(response.text)
+url = "https://trackapi.nutritionix.com/v2/natural/exercise"
 
-# # TODO: Post a pixel
-today = datetime.now()
-print(today.strftime("%Y%m%d"))
-post_pixel_config = {
-    "date": today.strftime("%Y%m%d"),
-    "quantity": "10"
+response = requests.post(url=url, json=parameters, headers=headers)
+data = response.json()
+
+url_sheet = "https://api.sheety.co/c116e53c4127320e7dac36feff50582f/workoutTracking/workouts"
+date = datetime.now()
+day = date.strftime("%d/%m/%Y")
+time = date.strftime("%X")
+
+headers_sheet = {
+    "Authorization": "Basic dGFiOlF1YW5nMTIzNDU2"
 }
-# post_pixel = f"https://pixe.la/v1/users/{user_name}/graphs/{graph_config['id']}"
-# response = requests.post(url=post_pixel, json=post_pixel_config, headers=headers)
-# print(response.text)
+
+for exercise in data["exercises"]:
+    parameters_sheet = {
+        "workout": {
+            "date": day,
+            "time": time,
+            "exercise": exercise["name"].title(),
+            "duration": exercise["duration_min"],
+            "calories": exercise["nf_calories"]
+        }
+    }
+    requests.post(url=url_sheet, json=parameters_sheet, headers=headers_sheet)
+# Ran 5k and cycled for 20 minutes
+
 
 
