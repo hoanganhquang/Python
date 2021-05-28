@@ -5,7 +5,6 @@ import time
 path = "D:/ChromeDr/chromedriver.exe"
 driver = webdriver.Chrome(executable_path=path)
 driver.get("https://www.instagram.com/accounts/login/")
-
 # user = driver.find_element_by_name("username")
 # password = driver.find_element_by_name("password")
 # login = driver.find_element_by_class_name("sqdOP")
