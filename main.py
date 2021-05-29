@@ -1,31 +1,26 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import time
+from flask import Flask
+import random
 
-path = "D:/ChromeDr/chromedriver.exe"
-driver = webdriver.Chrome(executable_path=path)
-driver.get("https://www.instagram.com/accounts/login/")
-# user = driver.find_element_by_name("username")
-# password = driver.find_element_by_name("password")
-# login = driver.find_element_by_class_name("sqdOP")
-#
-# user.send_keys("")
-# password.send_keys("")
-# login.click()
-#
-# time.sleep(5)
-# search = driver.find_element_by_class_name("XTCLo")
-# search.send_keys("")
-#
-# time.sleep(3)
-# choose = driver.find_element_by_class_name("Igw0E")
-# choose.click()
-#
-# time.sleep(5)
-# followers = driver.find_element_by_class_name("-nal3")
-# followers.click()
-#
-# time.sleep(2)
-# follow = driver.find_elements_by_class_name("wo9IH")
-# for i in follow:
-#     i.click()
+app = Flask(__name__)
+random_num = random.randint(0, 9)
+
+
+@app.route('/')
+def home_page():
+    return "<h1>Guess a number between 0 and 9</h1>" \
+           "<img src='https://i.giphy.com/media/3o7aCSPqXE5C6T8tBC/giphy.webp'>"
+
+
+@app.route('/<number>')
+def guess(number):
+    number = int(number)
+    if number > random_num:
+        return "<h1>Too high, try again!</h1>"
+    elif number < random_num:
+        return "<h1>Too low, try again!</h1>"
+    else:
+        return "<h1>You found me!</h1>"
+
+
+if __name__ == "__main__":
+    app.run(debug="on")
