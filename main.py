@@ -1,26 +1,32 @@
-from flask import Flask
-import random
+from flask import Flask, render_template
+import requests
 
 app = Flask(__name__)
-random_num = random.randint(0, 9)
+
 
 
 @app.route('/')
 def home_page():
-    return "<h1>Guess a number between 0 and 9</h1>" \
-           "<img src='https://i.giphy.com/media/3o7aCSPqXE5C6T8tBC/giphy.webp'>"
+    data_posts = requests.get(url="https://api.npoint.io/9d1c9613b0bbd767e135")
+    data = data_posts.json()
+    return render_template('index.html', response=data)
 
 
-@app.route('/<number>')
-def guess(number):
-    number = int(number)
-    if number > random_num:
-        return "<h1>Too high, try again!</h1>"
-    elif number < random_num:
-        return "<h1>Too low, try again!</h1>"
-    else:
-        return "<h1>You found me!</h1>"
+@app.route('/about')
+def about_page():
+    return render_template('about.html')
 
+
+@app.route('/contact')
+def contact_page():
+    return render_template('contact.html')
+
+
+@app.route('/post<int:num>')
+def to_post(num):
+    data_posts = requests.get(url="https://api.npoint.io/9d1c9613b0bbd767e135")
+    data = data_posts.json()
+    return render_template('post.html', post=data, num=num)
 
 if __name__ == "__main__":
     app.run(debug="on")
