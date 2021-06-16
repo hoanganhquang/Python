@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import requests
+import smtplib
 
 app = Flask(__name__)
 
@@ -19,10 +20,12 @@ def about_page():
 
 @app.route('/contact', methods=['POST', 'GET'])
 def contact_page():
+    message = False
     if request.method == 'POST':
-        r
 
-    return render_template('contact.html')
+        message = True
+
+    return render_template('contact.html', message=message)
 
 
 @app.route('/post<int:num>')
