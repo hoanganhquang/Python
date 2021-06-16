@@ -22,7 +22,6 @@ def about_page():
 def contact_page():
     message = False
     if request.method == 'POST':
-
         message = True
 
     return render_template('contact.html', message=message)
