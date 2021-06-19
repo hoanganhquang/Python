@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField
@@ -11,15 +11,15 @@ class CafeForm(FlaskForm):
     cafe_location = StringField("Cafe Location on Google Maps (URL)", validators=[DataRequired()])
     open_time = StringField("Opening Time e.g.8AM", validators=[DataRequired()])
     close_time = StringField("Closing Time e.g.5:30PM", validators=[DataRequired()])
-    coffee_rating = SelectField("Coffee Rating", choices=[(1,"✘"),(2,"☕"), (3,"☕☕"), (4,"☕☕☕"), (5,"☕☕☕☕"), (6,"☕☕☕☕☕")])
-    wifi = SelectField("Wifi Strength Rating", choices=[(1,"✘"),(2,"💪"), (3,"💪💪"), (4,"💪💪💪"), (5,"💪💪💪💪"), (6,"💪💪💪💪💪")])
-    power_socket = SelectField("Power Socket Availability",  choices=[(1,"✘"),(2,"🔌"), (3,"🔌🔌"), (4,"🔌🔌🔌"), (5,"🔌🔌🔌🔌"), (6,"🔌🔌🔌🔌🔌")])
+    coffee_rating = SelectField("Coffee Rating", choices=[("✘"), ("☕"), ("☕☕"), ("☕☕☕"), ("☕☕☕☕"), ("☕☕☕☕☕")])
+    wifi = SelectField("Wifi Strength Rating", choices=[("✘"),("💪"), ("💪💪"), ("💪💪💪"), ("💪💪💪💪"), ("💪💪💪💪💪")])
+    power_socket = SelectField("Power Socket Availability",  choices=[("✘"),("🔌"), ("🔌🔌"), ("🔌🔌🔌"), ("🔌🔌🔌🔌"), ("🔌🔌🔌🔌🔌")])
 
 
 
 app = Flask(__name__)
 Bootstrap(app)
-app.secret_key = "key"
+
 
 
 @app.route('/')
@@ -40,9 +40,9 @@ def add_page():
     cafe_form = CafeForm()
     cafe_form.validate_on_submit()
     if cafe_form.validate_on_submit():
-        with open("cafe-data.csv", mode="a") as file:
+        with open("cafe-data.csv", mode="a", encoding="utf-8") as file:
             file.write(f"\n{cafe_form.cafe_name.data},{cafe_form.cafe_location.data},{cafe_form.open_time.data},{cafe_form.close_time.data},{cafe_form.coffee_rating.data},{cafe_form.wifi.data},{cafe_form.power_socket.data}")
-
+        redirect(url_for("cafes_page"))
     return render_template('add.html', form=cafe_form)
 
 
