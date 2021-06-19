@@ -1,8 +1,7 @@
 {% extends 'bootstrap/base.html' %}
 
+
 {% block title %}Add A New Cafe{% endblock %}
-
-
 
 {% block content %}
 <div class="container">
@@ -11,7 +10,31 @@
 
       <h1>Add a new cafe into the database</h1>
 
-      <!-- This is where your WTForm will go -->
+      <form action="" method="">
+        {{form.csrf_token}}
+        {{form.cafe_name.label}} <br>
+        {{form.cafe_name(size=60)}} <br>
+        <br>
+        {{form.cafe_location.label}} <br>
+        {{form.cafe_location(size=60)}}<br>
+        <br>
+        {{form.open_time.label}} <br>
+        {{form.open_time(size=60)}}<br>
+        <br>
+        {{form.close_time.label}} <br>
+        {{form.close_time(size=60)}}<br>
+        <br>
+        {{form.coffee_rating.label}} <br>
+        {{form.coffee_rating}}<br>
+        <br>
+        {{form.wifi.label}} <br>
+        {{form.wifi(size=60)}}<br>
+        <br>
+        {{form.power_socket.label}} <br>
+        {{form.power_socket(size=60)}}<br>
+        <br>
+        <a class="btn btn-warning btn-lg" href="{{url_for('cafes_page')}}" role="button">Submit</a>
+      </form>
 
 	  <p class="space-above"><a href="{{url_for('cafes_page')}}">See all cafes</a></p>
 
