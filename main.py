@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 import requests
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = ''
+app.config['SECRET_KEY'] = 'HFHGFH'
 Bootstrap(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///movies-data.db"
@@ -18,6 +18,10 @@ db = SQLAlchemy(app)
 class EditForm(FlaskForm):
     your_rating = StringField("Your Rating Out of 10 e.g 7.5", validators=[DataRequired()])
     your_review = StringField("Your Review", validators=[DataRequired()])
+
+
+class AddForm(FlaskForm):
+    movie_title = StringField("Movie Title", validators=[DataRequired()])
 
 
 class Movie(db.Model):
@@ -37,7 +41,8 @@ db.create_all()
 @app.route("/")
 def home():
     data_movie = db.session.query(Movie).all()
-    return render_template("index.html", data=data_movie)
+    leng = len(data_movie)
+    return render_template("index.html", data=data_movie, length=leng)
 
 
 @app.route("/edit<int:id_movie>", methods=["POST", "GET"])
@@ -52,6 +57,21 @@ def edit(id_movie):
         return redirect(url_for("home"))
 
     return render_template("edit.html", form=form, id_send=id_movie)
+
+
+@app.route('/delete')
+def delete():
+    id_movie = request.args.get("id_movie")
+    delete_movie = Movie.query.get(id_movie)
+    db.session.delete(delete_movie)
+    db.session.commit()
+    return redirect(url_for('home'))
+
+
+@app.route('/add')
+def add():
+    add_form = AddForm()
+    return render_template('add.html', form=add_form)
 
 
 if __name__ == '__main__':
