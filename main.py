@@ -52,20 +52,47 @@ def random_page():
 @app.route("/all")
 def all_cafe():
     all_cafes = db.session.query(Cafe).all()
+    cafe_list = []
     for cafe in all_cafes:
-        return jsonify(cafe={cafe.id: {"can_take_calls": cafe.can_take_calls,
-                         "coffee_price": cafe.coffee_price,
-                         "has_sockets": cafe.has_sockets,
-                         "has_toilet": cafe.has_toilet,
-                         "has_wifi": cafe.has_wifi,
-                         "id": cafe.id,
-                         "img_url": cafe.img_url,
-                         "location": cafe.location,
-                         "map_url": cafe.map_url,
-                         "name": cafe.name,
-                         "seats": cafe.seats
-                         }})
+        cafes_data = {  "can_take_calls": cafe.can_take_calls,
+                        "coffee_price": cafe.coffee_price,
+                        "has_sockets": cafe.has_sockets,
+                        "has_toilet": cafe.has_toilet,
+                        "has_wifi": cafe.has_wifi,
+                        "id": cafe.id,
+                        "img_url": cafe.img_url,
+                        "location": cafe.location,
+                        "map_url": cafe.map_url,
+                        "name": cafe.name,
+                        "seats": cafe.seats
+                         }
+        cafe_list.append(cafes_data)
 
+    return jsonify(cafe=cafe_list)
+
+
+@app.route('/search/<area>')
+def search(area):
+    location = Cafe.query.filter_by(location=area).all()
+    if not location:
+        return jsonify(error="404")
+    else:
+        cafe_lst = []
+        for cafe in location:
+            data = {"can_take_calls": cafe.can_take_calls,
+                            "coffee_price": cafe.coffee_price,
+                            "has_sockets": cafe.has_sockets,
+                            "has_toilet": cafe.has_toilet,
+                            "has_wifi": cafe.has_wifi,
+                            "id": cafe.id,
+                            "img_url": cafe.img_url,
+                            "location": cafe.location,
+                            "map_url": cafe.map_url,
+                            "name": cafe.name,
+                            "seats": cafe.seats}
+            cafe_lst.append(data)
+
+        return jsonify(cafe=cafe_lst)
 # HTTP POST - Create Record
 
 # HTTP PUT/PATCH - Update Record
