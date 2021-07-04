@@ -130,5 +130,20 @@ def update_price(cafe_id):
         return jsonify(error="Not found id"), 404
 
 
+@app.route("/report-closed/<int:id_cafe>", methods=["DELETE"])
+def delete(id_cafe):
+    try:
+        get_cafe = request.args.get("api-key")
+        if get_cafe == "TopSecretAPIKey":
+            cafe_del = Cafe.query.get(id_cafe)
+            db.session.delete(cafe_del)
+            db.session.commit()
+            return jsonify(success="Delete successfully"), 200
+        else:
+            return jsonify(error="API wrong"), 400
+    except:
+        return jsonify(error="Not found id"), 400
+
+
 if __name__ == '__main__':
     app.run(debug=True)
