@@ -134,7 +134,7 @@ def update_price(cafe_id):
 def delete(id_cafe):
     try:
         get_cafe = request.args.get("api-key")
-        if get_cafe == "TopSecretAPIKey":
+        if get_cafe == "":
             cafe_del = Cafe.query.get(id_cafe)
             db.session.delete(cafe_del)
             db.session.commit()
