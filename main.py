@@ -25,6 +25,8 @@ class Cafe(db.Model):
     coffee_price = db.Column(db.String(250), nullable=True)
 
 
+db.create_all()
+
 
 @app.route("/")
 def home():
@@ -72,9 +74,10 @@ def all_cafe():
     return jsonify(cafe=cafe_list)
 
 
-@app.route('/search/<area>')
-def search(area):
-    location = Cafe.query.filter_by(location=area).all()
+@app.route('/search')
+def search():
+    get_loca = request.args.get("locate")
+    location = Cafe.query.filter_by(location=get_loca).all()
     if not location:
         return jsonify(error="404")
     else:
@@ -94,6 +97,26 @@ def search(area):
             cafe_lst.append(data)
 
         return jsonify(cafe=cafe_lst)
+
+
+@app.route("/add", methods=["POST"])
+def add():
+    new_cafe = Cafe(
+        name=request.form.get("name"),
+        map_url=request.form.get("map_url"),
+        img_url=request.form.get("img_url"),
+        location=request.form.get("locate"),
+        has_sockets=bool(request.form.get("sockets")),
+        has_toilet=bool(request.form.get("toilet")),
+        has_wifi=bool(request.form.get("wifi")),
+        can_take_calls=bool(request.form.get("calls")),
+        seats=request.form.get("seats"),
+        coffee_price=request.form.get("coffee_price"),
+    )
+    db.session.add(new_cafe)
+    db.session.commit()
+    return jsonify(response={"success": "Successfully added the new cafe."})
+
 # HTTP POST - Create Record
 
 # HTTP PUT/PATCH - Update Record
