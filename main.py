@@ -57,18 +57,18 @@ def all_cafe():
     all_cafes = db.session.query(Cafe).all()
     cafe_list = []
     for cafe in all_cafes:
-        cafes_data = {  "can_take_calls": cafe.can_take_calls,
-                        "coffee_price": cafe.coffee_price,
-                        "has_sockets": cafe.has_sockets,
-                        "has_toilet": cafe.has_toilet,
-                        "has_wifi": cafe.has_wifi,
-                        "id": cafe.id,
-                        "img_url": cafe.img_url,
-                        "location": cafe.location,
-                        "map_url": cafe.map_url,
-                        "name": cafe.name,
-                        "seats": cafe.seats
-                         }
+        cafes_data = {"can_take_calls": cafe.can_take_calls,
+                      "coffee_price": cafe.coffee_price,
+                      "has_sockets": cafe.has_sockets,
+                      "has_toilet": cafe.has_toilet,
+                      "has_wifi": cafe.has_wifi,
+                      "id": cafe.id,
+                      "img_url": cafe.img_url,
+                      "location": cafe.location,
+                      "map_url": cafe.map_url,
+                      "name": cafe.name,
+                      "seats": cafe.seats
+                      }
         cafe_list.append(cafes_data)
 
     return jsonify(cafe=cafe_list)
@@ -84,16 +84,16 @@ def search():
         cafe_lst = []
         for cafe in location:
             data = {"can_take_calls": cafe.can_take_calls,
-                            "coffee_price": cafe.coffee_price,
-                            "has_sockets": cafe.has_sockets,
-                            "has_toilet": cafe.has_toilet,
-                            "has_wifi": cafe.has_wifi,
-                            "id": cafe.id,
-                            "img_url": cafe.img_url,
-                            "location": cafe.location,
-                            "map_url": cafe.map_url,
-                            "name": cafe.name,
-                            "seats": cafe.seats}
+                    "coffee_price": cafe.coffee_price,
+                    "has_sockets": cafe.has_sockets,
+                    "has_toilet": cafe.has_toilet,
+                    "has_wifi": cafe.has_wifi,
+                    "id": cafe.id,
+                    "img_url": cafe.img_url,
+                    "location": cafe.location,
+                    "map_url": cafe.map_url,
+                    "name": cafe.name,
+                    "seats": cafe.seats}
             cafe_lst.append(data)
 
         return jsonify(cafe=cafe_lst)
@@ -117,11 +117,17 @@ def add():
     db.session.commit()
     return jsonify(response={"success": "Successfully added the new cafe."})
 
-# HTTP POST - Create Record
 
-# HTTP PUT/PATCH - Update Record
-
-# HTTP DELETE - Delete Record
+@app.route("/update-price/<int:cafe_id>", methods=["PATCH"])
+def update_price(cafe_id):
+    try:
+        get_cafe = request.args.get("new_price")
+        cafe_update = Cafe.query.get(cafe_id)
+        cafe_update.coffee_price = get_cafe
+        db.session.commit()
+        return jsonify(success="Updated successfully"), 200
+    except:
+        return jsonify(error="Not found id"), 404
 
 
 if __name__ == '__main__':
