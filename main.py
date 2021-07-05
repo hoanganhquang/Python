@@ -1,149 +1,86 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, render_template, redirect, url_for, request
+from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
-import random
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, URL
+from flask_ckeditor import CKEditor, CKEditorField
+from datetime import datetime
+
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+ckeditor = CKEditor(app)
+Bootstrap(app)
 
-# Connect to Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafes.db'
+# CONNECT TO DB
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-# Cafe TABLE Configuration
-class Cafe(db.Model):
+# CONFIGURE TABLE
+class BlogPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), unique=True, nullable=False)
-    map_url = db.Column(db.String(500), nullable=False)
-    img_url = db.Column(db.String(500), nullable=False)
-    location = db.Column(db.String(250), nullable=False)
-    seats = db.Column(db.String(250), nullable=False)
-    has_toilet = db.Column(db.Boolean, nullable=False)
-    has_wifi = db.Column(db.Boolean, nullable=False)
-    has_sockets = db.Column(db.Boolean, nullable=False)
-    can_take_calls = db.Column(db.Boolean, nullable=False)
-    coffee_price = db.Column(db.String(250), nullable=True)
+    title = db.Column(db.String(250), unique=True, nullable=False)
+    subtitle = db.Column(db.String(250), nullable=False)
+    date = db.Column(db.String(250), nullable=False)
+    body = db.Column(db.Text, nullable=False)
+    author = db.Column(db.String(250), nullable=False)
+    img_url = db.Column(db.String(250), nullable=False)
 
 
-db.create_all()
+# WTForm
+class CreatePostForm(FlaskForm):
+    title = StringField("Blog Post Title", validators=[DataRequired()])
+    subtitle = StringField("Subtitle", validators=[DataRequired()])
+    author = StringField("Your Name", validators=[DataRequired()])
+    img_url = StringField("Blog Image URL", validators=[DataRequired(), URL()])
+    body = CKEditorField("Blog Content", validators=[DataRequired()])
+    submit = SubmitField("Submit Post")
 
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+@app.route('/')
+def get_all_posts():
+    all_post = db.session.query(BlogPost).all()
+    return render_template("index.html", all_posts=all_post)
 
 
-# HTTP GET - Read Record
-@app.route('/random')
-def random_page():
-    all_cafes = db.session.query(Cafe).all()
-    one_cafe = random.choice(all_cafes)
-    return jsonify(cafe={"can_take_calls": one_cafe.can_take_calls,
-                         "coffee_price": one_cafe.coffee_price,
-                         "has_sockets": one_cafe.has_sockets,
-                         "has_toilet": one_cafe.has_toilet,
-                         "has_wifi": one_cafe.has_wifi,
-                         "id": one_cafe.id,
-                         "img_url": one_cafe.img_url,
-                         "location": one_cafe.location,
-                         "map_url": one_cafe.map_url,
-                         "name": one_cafe.name,
-                         "seats": one_cafe.seats
-                         })
+@app.route("/post/<int:index>")
+def show_post(index):
+    requested_post = BlogPost.query.get(index)
+    return render_template("post.html", post=requested_post)
 
 
-@app.route("/all")
-def all_cafe():
-    all_cafes = db.session.query(Cafe).all()
-    cafe_list = []
-    for cafe in all_cafes:
-        cafes_data = {"can_take_calls": cafe.can_take_calls,
-                      "coffee_price": cafe.coffee_price,
-                      "has_sockets": cafe.has_sockets,
-                      "has_toilet": cafe.has_toilet,
-                      "has_wifi": cafe.has_wifi,
-                      "id": cafe.id,
-                      "img_url": cafe.img_url,
-                      "location": cafe.location,
-                      "map_url": cafe.map_url,
-                      "name": cafe.name,
-                      "seats": cafe.seats
-                      }
-        cafe_list.append(cafes_data)
-
-    return jsonify(cafe=cafe_list)
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 
-@app.route('/search')
-def search():
-    get_loca = request.args.get("locate")
-    location = Cafe.query.filter_by(location=get_loca).all()
-    if not location:
-        return jsonify(error="404")
-    else:
-        cafe_lst = []
-        for cafe in location:
-            data = {"can_take_calls": cafe.can_take_calls,
-                    "coffee_price": cafe.coffee_price,
-                    "has_sockets": cafe.has_sockets,
-                    "has_toilet": cafe.has_toilet,
-                    "has_wifi": cafe.has_wifi,
-                    "id": cafe.id,
-                    "img_url": cafe.img_url,
-                    "location": cafe.location,
-                    "map_url": cafe.map_url,
-                    "name": cafe.name,
-                    "seats": cafe.seats}
-            cafe_lst.append(data)
-
-        return jsonify(cafe=cafe_lst)
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
 
 
-@app.route("/add", methods=["POST"])
-def add():
-    new_cafe = Cafe(
-        name=request.form.get("name"),
-        map_url=request.form.get("map_url"),
-        img_url=request.form.get("img_url"),
-        location=request.form.get("locate"),
-        has_sockets=bool(request.form.get("sockets")),
-        has_toilet=bool(request.form.get("toilet")),
-        has_wifi=bool(request.form.get("wifi")),
-        can_take_calls=bool(request.form.get("calls")),
-        seats=request.form.get("seats"),
-        coffee_price=request.form.get("coffee_price"),
-    )
-    db.session.add(new_cafe)
-    db.session.commit()
-    return jsonify(response={"success": "Successfully added the new cafe."})
+@app.route("/new_post", methods=["POST", "GET"])
+def new_post():
+    current_day = datetime.now().date().strftime("%B %d, %Y")
+    form = CreatePostForm()
+    if form.validate_on_submit():
+        post_new = BlogPost(title=form.title.data,
+                            subtitle=form.subtitle.data,
+                            date=current_day,
+                            author=form.author.data,
+                            img_url=form.author.data,
+                            body=form.body.data)
 
-
-@app.route("/update-price/<int:cafe_id>", methods=["PATCH"])
-def update_price(cafe_id):
-    try:
-        get_cafe = request.args.get("new_price")
-        cafe_update = Cafe.query.get(cafe_id)
-        cafe_update.coffee_price = get_cafe
+        db.session.add(post_new)
         db.session.commit()
-        return jsonify(success="Updated successfully"), 200
-    except:
-        return jsonify(error="Not found id"), 404
+
+        return redirect(url_for("get_all_posts"))
+
+    return render_template("make-post.html", form=form)
 
 
-@app.route("/report-closed/<int:id_cafe>", methods=["DELETE"])
-def delete(id_cafe):
-    try:
-        get_cafe = request.args.get("api-key")
-        if get_cafe == "":
-            cafe_del = Cafe.query.get(id_cafe)
-            db.session.delete(cafe_del)
-            db.session.commit()
-            return jsonify(success="Delete successfully"), 200
-        else:
-            return jsonify(error="API wrong"), 400
-    except:
-        return jsonify(error="Not found id"), 400
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug="On")
