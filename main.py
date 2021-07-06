@@ -1,117 +1,65 @@
-from flask import Flask, render_template, redirect, url_for, request
-from flask_bootstrap import Bootstrap
+from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, URL
-from flask_ckeditor import CKEditor, CKEditorField
-from datetime import datetime
-
+from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = ''
-ckeditor = CKEditor(app)
-Bootstrap(app)
 
-# CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+app.config['SECRET_KEY'] = 'any-secret-key-you-choose'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-# CONFIGURE TABLE
-class BlogPost(db.Model):
+# CREATE TABLE IN DB
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(250), unique=True, nullable=False)
-    subtitle = db.Column(db.String(250), nullable=False)
-    date = db.Column(db.String(250), nullable=False)
-    body = db.Column(db.Text, nullable=False)
-    author = db.Column(db.String(250), nullable=False)
-    img_url = db.Column(db.String(250), nullable=False)
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+    name = db.Column(db.String(1000))
 
 
-# WTForm
-class CreatePostForm(FlaskForm):
-    title = StringField("Blog Post Title", validators=[DataRequired()])
-    subtitle = StringField("Subtitle", validators=[DataRequired()])
-    author = StringField("Your Name", validators=[DataRequired()])
-    img_url = StringField("Blog Image URL", validators=[DataRequired(), URL()])
-    body = CKEditorField("Blog Content", validators=[DataRequired()])
-    submit = SubmitField("Submit Post")
+# Line below only required once, when creating DB.
+# db.create_all()
 
 
 @app.route('/')
-def get_all_posts():
-    all_post = db.session.query(BlogPost).all()
-    return render_template("index.html", all_posts=all_post)
+def home():
+    return render_template("index.html")
 
 
-@app.route("/post/<int:index>")
-def show_post(index):
-    requested_post = BlogPost.query.get(index)
-    return render_template("post.html", post=requested_post)
-
-
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
-
-@app.route("/contact")
-def contact():
-    return render_template("contact.html")
-
-
-@app.route("/new_post", methods=["POST", "GET"])
-def new_post():
-    current_day = datetime.now().date().strftime("%B %d, %Y")
-    form = CreatePostForm()
-    if form.validate_on_submit():
-        post_new = BlogPost(title=form.title.data,
-                            subtitle=form.subtitle.data,
-                            date=current_day,
-                            author=form.author.data,
-                            img_url=form.author.data,
-                            body=form.body.data)
-
-        db.session.add(post_new)
-        db.session.commit()
-
-        return redirect(url_for("get_all_posts"))
-
-    return render_template("make-post.html", form=form)
-
-
-@app.route("/edit-post/<int:post_id>", methods=["POST", "GET"])
-def edit_post(post_id):
-    post = BlogPost.query.get(post_id)
-    edit_form = CreatePostForm(
-        title=post.title,
-        subtitle=post.subtitle,
-        img_url=post.img_url,
-        author=post.author,
-        body=post.body
-    )
+@app.route('/register', methods=["POST", "GET"])
+def register():
     if request.method == "POST":
-        post.title = edit_form.title.data
-        post.subtitle = edit_form.subtitle.data
-        post.img_url = edit_form.img_url.data
-        post.author = edit_form.author.data
-        post.body = edit_form.body.data
+        new_user = User(name=request.form.get("name"),
+                        email=request.form.get("email"),
+                        password=request.form.get("password"))
+        db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for("show_post", index=post.id))
+        return redirect(url_for("secrets", name=request.form.get("name")))
+    return render_template("register.html")
 
-    return render_template("make-post.html", form=edit_form, is_edit=True)
+
+@app.route('/login')
+def login():
+    return render_template("login.html")
 
 
-@app.route("/delete-post/<int:id_post>")
-def delete_post(id_post):
-    post = BlogPost.query.get(id_post)
-    db.session.delete(post)
-    db.session.commit()
+@app.route('/secrets')
+def secrets():
+    name_user = request.args.get("name")
+    return render_template("secrets.html", name=name_user)
 
-    return redirect(url_for("get_all_posts"))
+
+@app.route('/logout')
+def logout():
+    pass
+
+
+@app.route('/download')
+def download():
+    pass
 
 
 if __name__ == "__main__":
-    app.run(debug="On")
+    app.run(debug=True)
