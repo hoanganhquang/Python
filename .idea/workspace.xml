@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c3deefe9-52c0-4e75-8da9-f6424e3442fe" name="Default Changelist" comment="Updated day 69">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,6 +103,7 @@
       <workItem from="1625794984961" duration="5094000" />
       <workItem from="1625906709658" duration="4748000" />
       <workItem from="1625991490287" duration="1441000" />
+      <workItem from="1625997907564" duration="373000" />
     </task>
     <task id="LOCAL-00001" summary="Updated day 66">
       <created>1625421335189</created>
@@ -196,7 +196,14 @@
       <option name="project" value="LOCAL" />
       <updated>1625911468273</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Updated day 69">
+      <created>1625998029080</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1625998029080</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -225,6 +232,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="Updated day 69" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/100_days$main.coverage" NAME="main Coverage Results" MODIFIED="1625991560855" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/100_days$main.coverage" NAME="main Coverage Results" MODIFIED="1625997959281" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
