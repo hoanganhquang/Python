@@ -13,6 +13,7 @@ from functools import wraps
 
 app = Flask(__name__)
 
+app.config["SECRET_KEY"] = "tab"
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
