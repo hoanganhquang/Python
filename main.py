@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import CreatePostForm, RegisterForm, LoginForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
 
@@ -25,13 +25,13 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-def admin_only(func):
-    @wraps(func)
+def admin_only(f):
+    @wraps(f)
     def deco(*args, **kwargs):
         if current_user.id != 1:
             return abort(403)
 
-        return func(*args, **kwargs)
+        return f(*args, **kwargs)
     return deco
 
 
@@ -48,16 +48,26 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(250), nullable=False)
     username = db.Column(db.String(250), nullable=False)
 
+    posts = relationship("BlogPost", back_populates="author")
+
 
 class BlogPost(db.Model):
     __tablename__ = "blog_posts"
     id = db.Column(db.Integer, primary_key=True)
-    author = db.Column(db.String(250), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+    author = relationship("User", back_populates="posts")
     title = db.Column(db.String(250), unique=True, nullable=False)
     subtitle = db.Column(db.String(250), nullable=False)
     date = db.Column(db.String(250), nullable=False)
     body = db.Column(db.Text, nullable=False)
-    img_url = db.Column(db.String(250), nullable=False)
+    img_url = db.Column(db.String(2500), nullable=False)
+
+
+class Comment(db.Model):
+    __tablename__ = "comments"
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
 
 
 db.create_all()
@@ -114,8 +124,9 @@ def logout():
 
 @app.route("/post/<int:post_id>")
 def show_post(post_id):
+    form = CommentForm()
     requested_post = BlogPost.query.get(post_id)
-    return render_template("post.html", post=requested_post, current_user=current_user)
+    return render_template("post.html", form=form, post=requested_post, current_user=current_user)
 
 
 @app.route("/about")
@@ -138,16 +149,16 @@ def add_new_post():
             subtitle=form.subtitle.data,
             body=form.body.data,
             img_url=form.img_url.data,
-            author=current_user,
+            author_id=current_user.id,
             date=date.today().strftime("%B %d, %Y")
         )
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form)
+    return render_template("make-post.html", form=form, current_user=current_user)
 
 
-@app.route("/edit-post/<int:post_id>")
+@app.route("/edit-post/<int:post_id>", methods=["POST", "GET"])
 @admin_only
 def edit_post(post_id):
     post = BlogPost.query.get(post_id)
@@ -155,19 +166,17 @@ def edit_post(post_id):
         title=post.title,
         subtitle=post.subtitle,
         img_url=post.img_url,
-        author=post.author,
         body=post.body
     )
     if edit_form.validate_on_submit():
         post.title = edit_form.title.data
         post.subtitle = edit_form.subtitle.data
         post.img_url = edit_form.img_url.data
-        post.author = edit_form.author.data
         post.body = edit_form.body.data
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
 
-    return render_template("make-post.html", form=edit_form)
+    return render_template("make-post.html", form=edit_form, is_edit=True, current_user=current_user)
 
 
 @app.route("/delete/<int:post_id>")
