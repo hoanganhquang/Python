@@ -133,7 +133,7 @@ def logout():
 def show_post(post_id):
     form = CommentForm()
     requested_post = BlogPost.query.get(post_id)
-    comments = Comment.query.all()
+
     if form.validate_on_submit():
         new_comment = Comment(
             text=form.body.data,
@@ -143,6 +143,7 @@ def show_post(post_id):
         db.session.add(new_comment)
         db.session.commit()
 
+    comments = Comment.query.all()
     return render_template("post.html", form=form, post=requested_post, current_user=current_user, comments=comments)
 
 
