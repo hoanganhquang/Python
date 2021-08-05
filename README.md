@@ -1,2 +1,2 @@
-# 100-day
+# 100-days
 Python
